@@ -1,14 +1,18 @@
-class StartGame {
+class Pong {
   constructor() {
-    this.curDirection = -3;
+    this.ballHeight = 30;
+    this.ballWidth = 30;
+    this.paddleWidth = 10;
+    this.paddleHeight = 75;
+
     this.app = new PIXI.Application({
       width: 799,
       height: 599,
       backgroundColor: 0xaaaaa9,
     });
     document.body.appendChild(this.app.view);
-    this._insertPaddleL();
-    this._insertBall();
+    this._insertPaddleL(this.paddleWidth, this.paddleHeight);
+    this._insertBall(this.ballWidth, this.ballHeight);
     document.addEventListener("keydown", (e) => {
       if (
         e.code === "ArrowDown" &&
@@ -19,33 +23,90 @@ class StartGame {
         this.leftPaddle.y -= 20;
       }
     });
+  }
+
+  start() {
     this.app.ticker.add((delta) => {
-      this.ball.x += this.curDirection;
-      if (
-        this.ball.x < this.leftPaddle.x + 1 &&
-        this.ball.x > this.leftPaddle.x - 1
-      )
-        this.curDirection = 3;
+      this.leftPaddle.updatePhysicals();
+      this.ball.updatePhysicals();
+
+      this.ball.x += this.ball.horizontalMovement;
+      this.ball.y += this.ball.verticalMovement;
+      if (this._ballHitsLeftPaddle()) {
+        this.ball.changeMovement(1, 1);
+      }
     });
   }
-  _insertPaddleL() {
+
+  _ballHitsLeftPaddle() {
+    if (this.ball.physicalX - this.leftPaddle.physicalX < 0) {
+      if (
+        this.ball.y > this.leftPaddle.physicalY[0] &&
+        this.ball.y < this.leftPaddle.physicalY[1]
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  _insertPaddleL(width, height) {
     this.leftPaddle = new PIXI.Sprite.from(PIXI.Texture.WHITE);
     this.leftPaddle.anchor.set(0.5, 0.5);
     this.leftPaddle.x = 15;
     this.leftPaddle.y = this.app.view.height / 2;
-    this.leftPaddle.height = 75;
-    this.leftPaddle.width = 10;
+    this.leftPaddle.height = height;
+    this.leftPaddle.width = width;
     this.app.stage.addChild(this.leftPaddle);
+
+    // creating my own members
+
+    // Need these values to make the paddle coming into contact with the pong more realistic
+    this.leftPaddle.yDifferential =
+      this.leftPaddle.height / 2 + this.ballHeight / 2;
+    this.leftPaddle.xDifferential = this.leftPaddle.width / 2;
+
+    // actual phsyical point of contact for paddle when coming into contact with ball
+    this.leftPaddle.updatePhysicals = () => {
+      this.leftPaddle.physicalY = [
+        this.leftPaddle.y - this.leftPaddle.yDifferential,
+        this.leftPaddle.y + this.leftPaddle.yDifferential,
+      ];
+      this.leftPaddle.physicalX =
+        this.leftPaddle.x + this.leftPaddle.xDifferential;
+    };
   }
-  _insertBall() {
-    this.ball = new PIXI.Graphics();
-    this.ball.beginFill(0xffffff);
-    this.ball.drawCircle(15, 15, 15);
-    this.ball.endFill();
+
+  _insertBall(width, height) {
+    this.ball = new PIXI.Sprite.from("./assets/pong_ball.png");
     this.ball.x = this.app.view.width / 2;
     this.ball.y = this.app.view.height / 2;
+    this.ball.height = width;
+    this.ball.width = height;
+    this.ball.anchor.set(0.5, 0.5);
     this.app.stage.addChild(this.ball);
+
+    // creating my own members
+
+    // Need these values to make the paddle coming into contact with the pong more realistic
+    this.ball.xDifferential = this.ball.width / 2;
+
+    // Actual physical point of contact for ball to hit paddle
+    this.ball.updatePhysicals = () => {
+      this.ball.physicalX = this.ball.x - this.ball.xDifferential;
+    };
+
+    // current movement of ball
+    this.ball.horizontalMovement = -1;
+    this.ball.verticalMovement = 0;
+
+    // creating my own methods
+    this.ball.changeMovement = (x, y) => {
+      this.ball.horizontalMovement = x;
+      this.ball.verticalMovement = y;
+    };
   }
 }
 
-let start = new StartGame();
+let pong = new Pong();
+pong.start();
