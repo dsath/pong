@@ -32,22 +32,76 @@ class Pong {
 
       this.ball.x += this.ball.horizontalMovement;
       this.ball.y += this.ball.verticalMovement;
-      if (this._ballHitsLeftPaddle()) {
-        this.ball.changeMovement(1, 1);
+      let quadrant = this._ballHitsLeftPaddle();
+      console.log(quadrant);
+      switch (quadrant) {
+        case 2:
+          this.ball.changeMovement(2, -3);
+          break;
+
+        case 1:
+          this.ball.changeMovement(2, -1);
+          break;
+
+        case -1:
+          this.ball.changeMovement(2, 1);
+          break;
+
+        case -2:
+          this.ball.changeMovement(2, 3);
+          break;
+
+        default:
+          break;
       }
     });
   }
 
   _ballHitsLeftPaddle() {
+    const fourthQuadrant = [
+      (this.leftPaddle.physicalY[1] + this.leftPaddle.y) / 2,
+      this.leftPaddle.physicalY[1],
+    ];
+    const thirdQuadrant = [
+      this.leftPaddle.y,
+      (this.leftPaddle.physicalY[1] + this.leftPaddle.y) / 2,
+    ];
+    const secondQuadrant = [
+      (this.leftPaddle.physicalY[0] + this.leftPaddle.y) / 2,
+      this.leftPaddle.y,
+    ];
+    const firstQuadrant = [
+      this.leftPaddle.physicalY[0],
+      (this.leftPaddle.physicalY[0] + this.leftPaddle.y) / 2,
+    ];
+    console.log(this.ball.y, fourthQuadrant);
+
     if (this.ball.physicalX - this.leftPaddle.physicalX < 0) {
       if (
-        this.ball.y > this.leftPaddle.physicalY[0] &&
-        this.ball.y < this.leftPaddle.physicalY[1]
+        this.ball.y >= fourthQuadrant[1] &&
+        this.ball.y <= fourthQuadrant[0]
       ) {
-        return true;
+        return 2;
+      } else if (
+        this.ball.y >= thirdQuadrant[1] &&
+        this.ball.y <= thirdQuadrant[0]
+      ) {
+        return 1;
+      } else if (
+        this.ball.y >= secondQuadrant[1] &&
+        this.ball.y <= secondQuadrant[0]
+      ) {
+        return -1;
+      } else if (
+        this.ball.y >= firstQuadrant[1] &&
+        this.ball.y <= firstQuadrant[0]
+      ) {
+        return -2;
+      } else {
+        return 0;
       }
     }
-    return false;
+    return 0;
   }
 
   _insertPaddleL(width, height) {
@@ -69,8 +123,8 @@ class Pong {
     // actual phsyical point of contact for paddle when coming into contact with ball
     this.leftPaddle.updatePhysicals = () => {
       this.leftPaddle.physicalY = [
-        this.leftPaddle.y - this.leftPaddle.yDifferential,
-        this.leftPaddle.y + this.leftPaddle.yDifferential,
+        this.leftPaddle.y + this.leftPaddle.yDifferential, // bottom of paddle
+        this.leftPaddle.y - this.leftPaddle.yDifferential, // top of paddle
       ];
       this.leftPaddle.physicalX =
         this.leftPaddle.x + this.leftPaddle.xDifferential;
