@@ -35,14 +35,21 @@ class Pong {
         this._leftPaddleHit();
       }
 
-      if (this._ballHitsBarrier) {
+      if (this._ballHitsBarrier()) {
+        this.ball.multiplyMovement(1, -1);
       }
     });
   }
 
   _ballHitsBarrier() {
-    if (this.ball.verticalContact) {
+    if (this.ball.verticalContact[1] < 0) {
+      this.ball.y += 10; // need to remove ball from contact zone so the same boolean value wont be returned
+      return true;
+    } else if (this.ball.verticalContact[0] > this.app.view.height) {
+      this.ball.y -= 10; // need to remove ball from contact zone so the same boolean value wont be returned
+      return true;
     }
+    return false;
   }
   _updateContactPoints() {
     this.leftPaddle.updateContactPoints();
@@ -159,15 +166,17 @@ class Pong {
 
     // current movement of ball
     this.ball.horizontalMovement = -5;
-    this.ball.horizontalContact = [];
     this.ball.verticalMovement = 0;
-    this.ball.horizontalContact = [];
 
     // creating my own methods
-    this.ball.horizontalContact = [];
     this.ball.changeMovement = (x, y) => {
       this.ball.horizontalMovement = x;
       this.ball.verticalMovement = y;
+    };
+
+    this.ball.multiplyMovement = (x, y) => {
+      this.ball.horizontalMovement = this.ball.horizontalMovement * x;
+      this.ball.verticalMovement = this.ball.verticalMovement * y;
     };
   }
 }
