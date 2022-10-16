@@ -12,6 +12,7 @@ class Pong {
     });
     document.body.appendChild(this.app.view);
     this._insertPaddleL(this.paddleWidth, this.paddleHeight);
+    this._insertPaddleR(this.paddleWidth, this.paddleHeight);
     this._insertBall(this.ballWidth, this.ballHeight);
     document.addEventListener("keydown", (e) => {
       if (
@@ -28,9 +29,11 @@ class Pong {
   start() {
     this.app.ticker.add((delta) => {
       this._updateContactPoints();
+      this.rightPaddle.changeMovement(-2);
 
       this.ball.x += this.ball.horizontalMovement;
       this.ball.y += this.ball.verticalMovement;
+      this.rightPaddle.y += this.rightPaddle.verticalMovement;
       if (this._ballHitsLeftPaddle()) {
         this._leftPaddleHit();
       }
@@ -53,6 +56,7 @@ class Pong {
   }
   _updateContactPoints() {
     this.leftPaddle.updateContactPoints();
+    this.rightPaddle.updateContactPoints();
     this.ball.updateContactPoints();
   }
 
@@ -135,6 +139,38 @@ class Pong {
       ];
       this.leftPaddle.horizontalContact =
         this.leftPaddle.x + this.leftPaddle.xDifferential;
+    };
+  }
+  _insertPaddleR(width, height) {
+    this.rightPaddle = new PIXI.Sprite.from(PIXI.Texture.WHITE);
+    this.rightPaddle.anchor.set(0.5, 0.5);
+    this.rightPaddle.x = this.app.view.width - 15;
+    this.rightPaddle.y = this.app.view.height / 2;
+    this.rightPaddle.height = height;
+    this.rightPaddle.width = width;
+    this.app.stage.addChild(this.rightPaddle);
+
+    // creating my own members
+    this.rightPaddle.verticalMovement = 1;
+
+    this.rightPaddle.changeMovement = function (x) {
+      this.verticalMovement = x;
+    };
+
+    // Need these values to make the paddle coming into contact with the pong more realistic
+    this.rightPaddle.yDifferential =
+      this.rightPaddle.height / 2 + this.ballHeight / 2;
+    this.rightPaddle.xDifferential = this.rightPaddle.width / 2;
+
+    // actual phsyical point of contact for paddle when coming into contact with ball
+
+    this.rightPaddle.updateContactPoints = () => {
+      this.rightPaddle.verticalContact = [
+        this.rightPaddle.y + this.rightPaddle.yDifferential, // bottom of paddle
+        this.rightPaddle.y - this.rightPaddle.yDifferential, // top of paddle
+      ];
+      this.rightPaddle.horizontalContact =
+        this.rightPaddle.x - this.rightPaddle.xDifferential;
     };
   }
 
