@@ -187,13 +187,12 @@ class Pong {
     this.leftPaddle.xDifferential = this.leftPaddle.width / 2;
 
     // actual phsyical point of contact for paddle when coming into contact with ball
-    this.leftPaddle.updateContactPoints = () => {
-      this.leftPaddle.verticalContact = [
-        this.leftPaddle.y + this.leftPaddle.yDifferential, // bottom of paddle
-        this.leftPaddle.y - this.leftPaddle.yDifferential, // top of paddle
+    this.leftPaddle.updateContactPoints = function () {
+      this.verticalContact = [
+        this.y + this.yDifferential, // bottom of paddle
+        this.y - this.yDifferential, // top of paddle
       ];
-      this.leftPaddle.horizontalContact =
-        this.leftPaddle.x + this.leftPaddle.xDifferential;
+      this.horizontalContact = this.x + this.xDifferential;
     };
   }
   _insertPaddleR(width, height) {
@@ -219,13 +218,12 @@ class Pong {
 
     // actual phsyical point of contact for paddle when coming into contact with ball
 
-    this.rightPaddle.updateContactPoints = () => {
-      this.rightPaddle.verticalContact = [
-        this.rightPaddle.y + this.rightPaddle.yDifferential, // bottom of paddle
-        this.rightPaddle.y - this.rightPaddle.yDifferential, // top of paddle
+    this.rightPaddle.updateContactPoints = function () {
+      this.verticalContact = [
+        this.y + this.yDifferential, // bottom of paddle
+        this.y - this.yDifferential, // top of paddle
       ];
-      this.rightPaddle.horizontalContact =
-        this.rightPaddle.x - this.rightPaddle.xDifferential;
+      this.horizontalContact = this.x - this.xDifferential;
     };
   }
 
@@ -244,15 +242,9 @@ class Pong {
     this.ball.radius = this.ball.width / 2;
 
     // Actual physical point of contact for ball to hit paddle
-    this.ball.updateContactPoints = () => {
-      this.ball.verticalContact = [
-        this.ball.y + this.ball.radius,
-        this.ball.y - this.ball.radius,
-      ];
-      this.ball.horizontalContact = [
-        this.ball.x - this.ball.radius,
-        this.ball.x + this.ball.radius,
-      ];
+    this.ball.updateContactPoints = function () {
+      this.verticalContact = [this.y + this.radius, this.y - this.radius];
+      this.horizontalContact = [this.x - this.radius, this.x + this.radius];
     };
 
     // current movement of ball
@@ -260,14 +252,14 @@ class Pong {
     this.ball.verticalMovement = 0;
 
     // creating my own methods
-    this.ball.changeMovement = (x, y) => {
-      this.ball.horizontalMovement = x;
-      this.ball.verticalMovement = y;
+    this.ball.changeMovement = function (x, y) {
+      this.horizontalMovement = x;
+      this.verticalMovement = y;
     };
 
-    this.ball.multiplyMovement = (x, y) => {
-      this.ball.horizontalMovement = this.ball.horizontalMovement * x;
-      this.ball.verticalMovement = this.ball.verticalMovement * y;
+    this.ball.multiplyMovement = function (x, y) {
+      this.horizontalMovement = this.horizontalMovement * x;
+      this.verticalMovement = this.verticalMovement * y;
     };
   }
 }
