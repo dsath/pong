@@ -29,7 +29,7 @@ class Pong {
   start() {
     this.app.ticker.add((delta) => {
       this._updateContactPoints();
-      this.rightPaddle.changeMovement(-2);
+      // this.rightPaddle.changeMovement(-2);
 
       this.ball.x += this.ball.horizontalMovement;
       this.ball.y += this.ball.verticalMovement;
@@ -40,6 +40,10 @@ class Pong {
 
       if (this._ballHitsBarrier()) {
         this.ball.multiplyMovement(1, -1);
+      }
+
+      if (this._ballHitsRightPaddle()) {
+        this._rightPaddleHit();
       }
     });
   }
@@ -114,7 +118,58 @@ class Pong {
       this.ball.changeMovement(2, 3);
     }
   }
+  _rightPaddleHit() {
+    const fourthQuadrant = [
+      (this.rightPaddle.verticalContact[1] + this.rightPaddle.y) / 2,
+      this.rightPaddle.verticalContact[1],
+    ];
+    const thirdQuadrant = [
+      this.rightPaddle.y,
+      (this.rightPaddle.verticalContact[1] + this.rightPaddle.y) / 2,
+    ];
+    const secondQuadrant = [
+      (this.rightPaddle.verticalContact[0] + this.rightPaddle.y) / 2,
+      this.rightPaddle.y,
+    ];
+    const firstQuadrant = [
+      this.rightPaddle.verticalContact[0],
+      (this.rightPaddle.verticalContact[0] + this.rightPaddle.y) / 2,
+    ];
 
+    if (this.ball.y >= fourthQuadrant[1] && this.ball.y <= fourthQuadrant[0]) {
+      this.ball.changeMovement(-2, -3);
+    } else if (
+      this.ball.y >= thirdQuadrant[1] &&
+      this.ball.y <= thirdQuadrant[0]
+    ) {
+      this.ball.changeMovement(-2, -1);
+    } else if (
+      this.ball.y >= secondQuadrant[1] &&
+      this.ball.y <= secondQuadrant[0]
+    ) {
+      this.ball.changeMovement(-2, 1);
+    } else if (
+      this.ball.y >= firstQuadrant[1] &&
+      this.ball.y <= firstQuadrant[0]
+    ) {
+      this.ball.changeMovement(-2, 3);
+    }
+  }
+
+  _ballHitsRightPaddle() {
+    if (
+      this.ball.horizontalContact[1] - this.rightPaddle.horizontalContact >
+      0
+    ) {
+      if (
+        this.ball.y >= this.rightPaddle.verticalContact[1] &&
+        this.ball.y <= this.rightPaddle.verticalContact[0]
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
   _insertPaddleL(width, height) {
     this.leftPaddle = new PIXI.Sprite.from(PIXI.Texture.WHITE);
     this.leftPaddle.anchor.set(0.5, 0.5);
@@ -151,7 +206,7 @@ class Pong {
     this.app.stage.addChild(this.rightPaddle);
 
     // creating my own members
-    this.rightPaddle.verticalMovement = 1;
+    this.rightPaddle.verticalMovement = 0;
 
     this.rightPaddle.changeMovement = function (x) {
       this.verticalMovement = x;
