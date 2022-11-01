@@ -34,6 +34,11 @@ class Pong {
       this.ball.x += this.ball.horizontalMovement;
       this.ball.y += this.ball.verticalMovement;
       this.rightPaddle.y += this.rightPaddle.verticalMovement;
+
+      if (this._ballHitsLeftOrRightWalls()) {
+        this._gameDone();
+      }
+
       if (this._ballHitsLeftPaddle()) {
         this._leftPaddleHit();
       }
@@ -170,8 +175,20 @@ class Pong {
     }
     return false;
   }
+
+  _ballHitsLeftOrRightWalls() {
+    return (
+      this.ball.horizontalContact[0] < 0 ||
+      this.ball.horizontalContact[1] - this.app.view.width > 0
+    );
+  }
+
+  _gameDone() {
+    this.app.ticker.stop();
+  }
+
   _insertPaddleL(width, height) {
-    this.leftPaddle = new PIXI.Sprite.from(PIXI.Texture.WHITE);
+    this.leftPaddle = PIXI.Sprite.from(PIXI.Texture.WHITE);
     this.leftPaddle.anchor.set(0.5, 0.5);
     this.leftPaddle.x = 15;
     this.leftPaddle.y = this.app.view.height / 2;
@@ -196,7 +213,7 @@ class Pong {
     };
   }
   _insertPaddleR(width, height) {
-    this.rightPaddle = new PIXI.Sprite.from(PIXI.Texture.WHITE);
+    this.rightPaddle = PIXI.Sprite.from(PIXI.Texture.WHITE);
     this.rightPaddle.anchor.set(0.5, 0.5);
     this.rightPaddle.x = this.app.view.width - 15;
     this.rightPaddle.y = this.app.view.height / 2;
@@ -228,7 +245,7 @@ class Pong {
   }
 
   _insertBall(width, height) {
-    this.ball = new PIXI.Sprite.from("./assets/pong_ball.png");
+    this.ball = PIXI.Sprite.from("./assets/pong_ball.png");
     this.ball.x = this.app.view.width / 2;
     this.ball.y = this.app.view.height / 2;
     this.ball.height = width;
