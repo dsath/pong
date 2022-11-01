@@ -50,6 +50,8 @@ class Pong {
       if (this._ballHitsRightPaddle()) {
         this._rightPaddleHit();
       }
+
+      this._rightPaddleAI(1);
     });
   }
 
@@ -187,6 +189,13 @@ class Pong {
     this.app.ticker.stop();
   }
 
+  _rightPaddleAI(x) {
+    if (this.ball.y > this.rightPaddle.y) {
+      this.rightPaddle.changeMovement(x);
+    } else if (this.ball.y < this.rightPaddle.y) {
+      this.rightPaddle.changeMovement(-x);
+    }
+  }
   _insertPaddleL(width, height) {
     this.leftPaddle = PIXI.Sprite.from(PIXI.Texture.WHITE);
     this.leftPaddle.anchor.set(0.5, 0.5);
@@ -242,6 +251,8 @@ class Pong {
       ];
       this.horizontalContact = this.x - this.xDifferential;
     };
+
+    // paddle AI
   }
 
   _insertBall(width, height) {
